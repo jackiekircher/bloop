@@ -42,21 +42,30 @@
   # difference between tip and anchor
   v3 := tentacle_x
   v3 -= v7
-  v5 := 1
-  if vf == 0 then v5 := -1
-
-  v4 := tentacle_y
-  v4 -= v8
-  v6 := 1
-  if vf == 0 then v6 := -1
+  v4 := 1
+  if vf == 0 then v4 := -1
 
   v0 := 0
   loop
     while v0 != v3
       i := tentacle-tip
       sprite v7 v8 1
-      v7 += v5
-      v0 += v5
+      v7 += v4
+      v0 += v4
+  again
+
+  v3 := tentacle_y
+  v3 -= v8
+  v4 := 1
+  if vf == 0 then v4 := -1
+
+  v0 := 0
+  loop
+    while v0 != v3
+      i := tentacle-tip
+      sprite v7 v8 1
+      v8 += v4
+      v0 += v4
   again
 ;
 
