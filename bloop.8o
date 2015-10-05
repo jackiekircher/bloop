@@ -33,6 +33,31 @@
   i := tentacle-tip
   sprite tentacle_x tentacle_y 1
   plane 1
+
+  # anchor point
+  v7 := podoop_x
+  v8 := podoop_y
+  v8 += 7
+
+  # difference between tip and anchor
+  v3 := tentacle_x
+  v3 -= v7
+  v5 := 1
+  if vf == 0 then v5 := -1
+
+  v4 := tentacle_y
+  v4 -= v8
+  v6 := 1
+  if vf == 0 then v6 := -1
+
+  v0 := 0
+  loop
+    while v0 != v3
+      i := tentacle-tip
+      sprite v7 v8 1
+      v7 += v5
+      v0 += v5
+  again
 ;
 
 
@@ -44,12 +69,10 @@
   i        := podoop-head
   sprite podoop_x podoop_y 7
 
-  tentacle_x := 20
-  tentacle_y := 20
+  tentacle_x := 55
+  tentacle_y := 24
   i          := tentacle-tip
-  plane 2
-  sprite tentacle_x tentacle_y 1
-  plane 1
+  draw-tentacle
 
   loop
     move-tentacle
@@ -80,17 +103,21 @@
   if move_y != 0 then v0 := 1
   if v0 == 0 then return
 
-  plane 2
-  i := tentacle-tip
+  # optimal draw (no ficker)
+  # plane 2
+  # i := tentacle-tip
+  # v3 := tentacle_x
+  # v4 := tentacle_y
+  # tentacle_x += move_x
+  # tentacle_y += move_y
+  # sprite v3 v4 1
+  # sprite tentacle_x tentacle_y 1
+  # plane 1
 
-  # erase old arm
-  v3 := tentacle_x
-  v4 := tentacle_y
+  # erase old tentacle tip
+  draw-tentacle
+
   tentacle_x += move_x
   tentacle_y += move_y
-
-  sprite v3 v4 1
-  sprite tentacle_x tentacle_y 1
-
-  plane 1
+  draw-tentacle
 ;
