@@ -44,6 +44,10 @@
   v3 -= v7
   v4 := 1
   if vf == 0 then v4 := -1
+  if vf == 0 begin
+    v3 := v7
+    v3 -= tentacle_x
+  end
 
   v0 := 0
   loop
@@ -51,21 +55,31 @@
       i := tentacle-tip
       sprite v7 v8 1
       v7 += v4
-      v0 += v4
+      v0 += 1
   again
 
   v3 := tentacle_y
   v3 -= v8
   v4 := 1
   if vf == 0 then v4 := -1
+  if vf == 0 begin
+    v3 := v8
+    v3 -= tentacle_y
+  end
 
-  v0 := 0
+  # no need to draw the vertical segment if there is none
+  if v3 == 0 then return
+
+  # skip the first loop iteration to literally cut a corner on the
+  # tentacle
+  v0 := 1
+  v8 += v4
   loop
     while v0 != v3
       i := tentacle-tip
       sprite v7 v8 1
       v8 += v4
-      v0 += v4
+      v0 += 1
   again
 ;
 
