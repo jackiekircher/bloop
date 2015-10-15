@@ -16,6 +16,10 @@
 : tentacle-tip
   0x80
 
+: tentacle
+  0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+  0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
 #-- setup --#
 
   # registers
@@ -33,54 +37,6 @@
   i := tentacle-tip
   sprite tentacle_x tentacle_y 1
   plane 1
-
-  # anchor point
-  v7 := podoop_x
-  v8 := podoop_y
-  v8 += 7
-
-  # difference between tip and anchor
-  v3 := tentacle_x
-  v3 -= v7
-  v4 := 1
-  if vf == 0 then v4 := -1
-  if vf == 0 begin
-    v3 := v7
-    v3 -= tentacle_x
-  end
-
-  v0 := 0
-  loop
-    while v0 != v3
-      i := tentacle-tip
-      sprite v7 v8 1
-      v7 += v4
-      v0 += 1
-  again
-
-  v3 := tentacle_y
-  v3 -= v8
-  v4 := 1
-  if vf == 0 then v4 := -1
-  if vf == 0 begin
-    v3 := v8
-    v3 -= tentacle_y
-  end
-
-  # no need to draw the vertical segment if there is none
-  if v3 == 0 then return
-
-  # skip the first loop iteration to literally cut a corner on the
-  # tentacle
-  v0 := 1
-  v8 += v4
-  loop
-    while v0 != v3
-      i := tentacle-tip
-      sprite v7 v8 1
-      v8 += v4
-      v0 += 1
-  again
 ;
 
 
@@ -92,14 +48,16 @@
   i        := podoop-head
   sprite podoop_x podoop_y 7
 
-  tentacle_x := 55
-  tentacle_y := 24
+  tentacle_x := podoop_x
+  tentacle_y := podoop_y
+  tentacle_y += 7
   i          := tentacle-tip
   draw-tentacle
 
   loop
     move-tentacle
   again
+
 ;
 
 : move-tentacle
@@ -126,21 +84,75 @@
   if move_y != 0 then v0 := 1
   if v0 == 0 then return
 
-  # optimal draw (no ficker)
-  # plane 2
-  # i := tentacle-tip
-  # v3 := tentacle_x
-  # v4 := tentacle_y
-  # tentacle_x += move_x
-  # tentacle_y += move_y
-  # sprite v3 v4 1
-  # sprite tentacle_x tentacle_y 1
-  # plane 1
+  # DEBUG #
+    # erase old tentacle sprite
+    i  := tentacle
+    v0 := 0
+    sprite v0 v0 15
 
-  # erase old tentacle tip
+
+  # anchor point
+  v7 := podoop_x
+  v8 := podoop_y
+  v8 += 7
+
+  # difference between tip and anchor
+  v3 := tentacle_x
+  v3 -= v7
+  v4 := 1
+  if vf == 0 begin
+    v4 := -1
+    v3 := v7
+    v3 -= tentacle_x
+  end
+
+  if v4 ==  1 then v6 := 0x80
+  if v4 == -1 then v6 := 0x01
+  if v3 ==  0 then v6 := 0x01
+  loop
+    while v3 != 0
+      if v4 ==  1 then v6 >>= v6 #tip is moving +x
+      if v4 == -1 then v6 <<= v6 #tip is moving -x
+      v3 +=  -1
+  again
+
+  v9 := 7  #default row is in the middle of the sprite
+  v3 := tentacle_y
+  v3 -= v8
+  v4 := 1
+  if vf == 0 begin
+    v4 := -1
+    v3 := v8
+    v3 -= tentacle_y
+  end
+
+  loop #adjust the row by setting the srpite instruction offset
+    while v3 != 0
+      v9 += v4
+      v3 += -1
+  again
+
+
+  i  := tentacle
+  i  += v9
+  load v0
+
+  v0 ^= v6
+
+  i  := tentacle
+  i  += v9
+  save v0
+
+
   draw-tentacle
-
+  sprite tentacle_x tentacle_y 1
   tentacle_x += move_x
   tentacle_y += move_y
   draw-tentacle
+
+  # DEBUG #
+    # draw new tentacle sprite
+    i  := tentacle
+    v0 := 0
+    sprite v0 v0 15
 ;
