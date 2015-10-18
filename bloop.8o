@@ -80,7 +80,10 @@
   loop
     steer-arm1
     move-arm1
+    if vf == 0 then
   again
+
+  game-over
 ;
 
 : steer-arm1
@@ -134,4 +137,17 @@
   arm1_x += v1
   arm1_y += v2
   draw-arm1
+
+;
+
+: game-over
+  loop
+    draw-arm1
+    v0    := 10
+    delay := v0
+    loop
+      v0 := delay
+      if v0 != 0 then
+    again
+  again
 ;
