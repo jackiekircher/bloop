@@ -33,10 +33,8 @@
 
 # draws the tentacle
 : draw-tentacle
-  plane 2
   i := tentacle-tip
   sprite tentacle_x tentacle_y 1
-  plane 1
 ;
 
 
@@ -84,6 +82,9 @@
   if move_y != 0 then v0 := 1
   if v0 == 0 then return
 
+  move_x += tentacle_x
+  move_y += tentacle_y
+
   # DEBUG #
     # erase old tentacle sprite
     i  := tentacle
@@ -96,14 +97,14 @@
   v8 := podoop_y
   v8 += 7
 
-  # difference between tip and anchor
-  v3 := tentacle_x
+  # x coordinate handling
+  v3 := move_x
   v3 -= v7
   v4 := 1
   if vf == 0 begin
     v4 := -1
     v3 := v7
-    v3 -= tentacle_x
+    v3 -= move_x
   end
 
   if v4 ==  1 then v6 := 0x80
@@ -116,14 +117,15 @@
       v3 +=  -1
   again
 
+  # y coordinate handling
   v9 := 7  #default row is in the middle of the sprite
-  v3 := tentacle_y
+  v3 := move_y
   v3 -= v8
   v4 := 1
   if vf == 0 begin
     v4 := -1
     v3 := v8
-    v3 -= tentacle_y
+    v3 -= move_y
   end
 
   loop #adjust the row by setting the srpite instruction offset
@@ -137,18 +139,60 @@
   i  += v9
   load v0
 
-  v0 ^= v6
+  v3 := v0
+  v3 ^= v6
+  
+  # 01000000 v6
+  # 01111100 v0
+  # 00111100 v0 ^= v6
 
+  # 01000000 v6
+  # 11000011 NOT v0
+  # 01000000 v6 &= v0 AND
+  v5 := v3
+  v4 := 0xFF
+  v5 ^= v4 # bitwise NOT of v0
+  v7 := v6
+  v7 &= v5
+  if v7 == v6 begin # backtracking
+
+    # erase where we were and do not erase where we are
+    move_x -= tentacle_x
+    move_y -= tentacle_y
+
+    if move_x ==  1 then v6 <<= v6
+    if move_x == -1 then v6 >>= v6
+    if move_y ==  1 begin
+      v9 += -1
+      i  := tentacle
+      i  += v9
+      load v0
+    end
+    if move_y == -1 begin
+      v9 += 1
+      i  := tentacle
+      i  += v9
+      load v0
+    end
+
+    v3 := v0
+    v3 ^= v6
+
+    draw-tentacle
+    tentacle_x += move_x
+    tentacle_y += move_y
+  else
+    tentacle_x := move_x
+    tentacle_y := move_y
+    draw-tentacle
+  end
+
+
+  v0 := v3
   i  := tentacle
   i  += v9
   save v0
 
-
-  draw-tentacle
-  sprite tentacle_x tentacle_y 1
-  tentacle_x += move_x
-  tentacle_y += move_y
-  draw-tentacle
 
   # DEBUG #
     # draw new tentacle sprite
