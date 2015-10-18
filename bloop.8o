@@ -4,105 +4,61 @@
 #----------------------------#
 
 #-- sprites --#
-: podoop #11x12
+: octopus #11x12
   0x0F 0x00 0x1F 0x80 0x1F 0x80 0x1F 0x80
   0x1F 0x80 0x0A 0x80 0x0F 0x00 0x1A 0x80
   0x2A 0x80 0x2A 0x80 0xAA 0xA0 0x51 0x40
   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
 
-: podoop-head #6x7
+: octopus-head #6x7
   0x78 0xFC 0xFC 0xFC 0xFC 0x54 0x78
 
-: tentacle-tip
+: dot
   0x80
 
 #-- setup --#
 
   # registers
-  :alias podoop_x   va
-  :alias podoop_y   vb
-  :alias tentacle_x vc
-  :alias tentacle_y vd
+  :alias arm1_x va
+  :alias arm1_y vb
+  :alias arm2_x vc
+  :alias arm2_y vd
 
 
 #-- drawing --#
 
 # draws the tentacle
-: draw-tentacle
-  plane 2
-  i := tentacle-tip
-  sprite tentacle_x tentacle_y 1
-  plane 1
-
-  # anchor point
-  v7 := podoop_x
-  v8 := podoop_y
-  v8 += 7
-
-  # difference between tip and anchor
-  v3 := tentacle_x
-  v3 -= v7
-  v4 := 1
-  if vf == 0 then v4 := -1
-  if vf == 0 begin
-    v3 := v7
-    v3 -= tentacle_x
-  end
-
-  v0 := 0
-  loop
-    while v0 != v3
-      i := tentacle-tip
-      sprite v7 v8 1
-      v7 += v4
-      v0 += 1
-  again
-
-  v3 := tentacle_y
-  v3 -= v8
-  v4 := 1
-  if vf == 0 then v4 := -1
-  if vf == 0 begin
-    v3 := v8
-    v3 -= tentacle_y
-  end
-
-  # no need to draw the vertical segment if there is none
-  if v3 == 0 then return
-
-  # skip the first loop iteration to literally cut a corner on the
-  # tentacle
-  v0 := 1
-  v8 += v4
-  loop
-    while v0 != v3
-      i := tentacle-tip
-      sprite v7 v8 1
-      v8 += v4
-      v0 += 1
-  again
+: draw-arm1
+  i := dot
+  sprite arm1_x arm1_y 1
 ;
 
+: setup
+  hires
+;
 
 : main
-  hires
+  setup
 
-  podoop_x := 60
-  podoop_y := 24
-  i        := podoop-head
-  sprite podoop_x podoop_y 7
+  # draw the octopus head
+  # v1 -> x coordinate
+  # v2 -> y coordinate
+  v1 := 60
+  v2 := 24
+  i  := octopus-head
+  sprite v1 v2 7
 
-  tentacle_x := 55
-  tentacle_y := 24
-  i          := tentacle-tip
-  draw-tentacle
+  # start arm1 (left) below the head
+  arm1_x := 60
+  arm1_y := 31
+  draw-arm1
 
   loop
-    move-tentacle
+    move-arm1
   again
 ;
 
-: move-tentacle
+: move-arm1
   :alias input  v0
   :alias move_x v1
   :alias move_y v2
@@ -126,21 +82,7 @@
   if move_y != 0 then v0 := 1
   if v0 == 0 then return
 
-  # optimal draw (no ficker)
-  # plane 2
-  # i := tentacle-tip
-  # v3 := tentacle_x
-  # v4 := tentacle_y
-  # tentacle_x += move_x
-  # tentacle_y += move_y
-  # sprite v3 v4 1
-  # sprite tentacle_x tentacle_y 1
-  # plane 1
-
-  # erase old tentacle tip
-  draw-tentacle
-
-  tentacle_x += move_x
-  tentacle_y += move_y
-  draw-tentacle
+  arm1_x += move_x
+  arm1_y += move_y
+  draw-arm1
 ;
