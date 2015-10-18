@@ -16,6 +16,7 @@
 : dot
   0x80
 
+
 #-- setup --#
 
   # registers
@@ -23,6 +24,23 @@
   :alias arm1_y vb
   :alias arm2_x vc
   :alias arm2_y vd
+
+  :const UPLEFT    1
+  :const UP        2
+  :const UPRIGHT   3
+  :const LEFT      4
+  :const STOP      5
+  :const RIGHT     6
+  :const DOWNLEFT  7
+  :const DOWN      8
+  :const DOWNRIGHT 9
+
+  # game-state
+  : arm1-direction 4
+
+: setup
+  hires
+;
 
 
 #-- drawing --#
@@ -33,9 +51,8 @@
   sprite arm1_x arm1_y 1
 ;
 
-: setup
-  hires
-;
+
+# -- main --#
 
 : main
   setup
@@ -54,35 +71,54 @@
   draw-arm1
 
   loop
+    steer-arm1
     move-arm1
   again
 ;
 
-: move-arm1
-  :alias input  v0
-  :alias move_x v1
-  :alias move_y v2
+: steer-arm1
+  :alias input v1
 
-  move_x := 0
-  move_y := 0
+  i := arm1-direction
+  load v0
 
   input := 5 #w
-  if input key then move_y += -1
+  if input key then v0 := UP
   input := 7 #a
-  if input key then move_x += -1
+  if input key then v0 := LEFT
   input := 8 #s
-  if input key then move_y +=  1
+  if input key then v0 := DOWN
   input := 9 #d
-  if input key then move_x +=  1
+  if input key then v0 := RIGHT
 
-  # return early and don't change anything if no
-  # direction keys are being pressed
-  v0 := 0
-  if move_x != 0 then v0 := 1
-  if move_y != 0 then v0 := 1
-  if v0 == 0 then return
+  i := arm1-direction
+  save v0
+;
 
-  arm1_x += move_x
-  arm1_y += move_y
+: move-arm1
+# v1 -> dx
+  v1 := 0
+# v2 -> dy
+  v2 := 0
+
+  i := arm1-direction
+  load v0
+
+  if v0 == UPLEFT    then v1 += -1
+  if v0 == LEFT      then v1 += -1
+  if v0 == DOWNLEFT  then v1 += -1
+  if v0 == UPRIGHT   then v1 +=  1
+  if v0 == RIGHT     then v1 +=  1
+  if v0 == DOWNRIGHT then v1 +=  1
+
+  if v0 == UPLEFT    then v2 += -1
+  if v0 == UP        then v2 += -1
+  if v0 == UPRIGHT   then v2 += -1
+  if v0 == DOWNLEFT  then v2 +=  1
+  if v0 == DOWN      then v2 +=  1
+  if v0 == DOWNRIGHT then v2 +=  1
+
+  arm1_x += v1
+  arm1_y += v2
   draw-arm1
 ;
