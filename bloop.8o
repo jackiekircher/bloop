@@ -25,18 +25,25 @@
   :alias arm2_x vc
   :alias arm2_y vd
 
-  :const UPLEFT    1
-  :const UP        2
-  :const UPRIGHT   3
-  :const LEFT      4
-  :const STOP      5
-  :const RIGHT     6
-  :const DOWNLEFT  7
-  :const DOWN      8
-  :const DOWNRIGHT 9
+  # directions
+  # these are all weird looking so that two cardinal directions
+  # can be added together to make a diagonal direction
+  #
+  # UP + DOWN  -> 0
+  # UP + RIGHT -> UPRIGHT
+  #
+  :const UP        -1
+  :const LEFT      -3
+  :const DOWN       1
+  :const RIGHT      3
+  :const UPLEFT    -4
+  :const UPRIGHT    2
+  :const STOP       0
+  :const DOWNLEFT  -2
+  :const DOWNRIGHT  4
 
   # game-state
-  : arm1-direction 4
+  : arm1-direction -3
 
 : setup
   hires
@@ -82,16 +89,22 @@
   i := arm1-direction
   load v0
 
+# v1 -> new arm direction
+  v2 := 0
   input := 5 #w
-  if input key then v0 := UP
+  if input key then v2 += UP
   input := 7 #a
-  if input key then v0 := LEFT
+  if input key then v2 += LEFT
   input := 8 #s
-  if input key then v0 := DOWN
+  if input key then v2 += DOWN
   input := 9 #d
-  if input key then v0 := RIGHT
+  if input key then v2 += RIGHT
 
-  i := arm1-direction
+# can't stop won't stop
+  if v2 == 0 then return
+
+  v0 := v2
+  i  := arm1-direction
   save v0
 ;
 
