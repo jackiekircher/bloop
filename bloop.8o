@@ -35,7 +35,7 @@
   0xFF 0x80 0x40 0x80 0x40 0x80 0x8C 0x80
   0x92 0x80 0x92 0x80 0xA2 0x80 0xA4 0x80
   0x99 0x00 0x81 0x00 0xFF 0x80
-  
+
 
 
 #-- setup --#
@@ -63,8 +63,13 @@
   :const DOWNLEFT  -2
   :const DOWNRIGHT  4
 
+  :const FALSE 0
+  :const TRUE  1
+
   # game-state
   : arm1-direction -3
+
+  : shrimp-collected 0
 
 : setup
   hires
@@ -98,13 +103,17 @@
   arm1_y := 31
   draw-arm1
 
+# v1 -> test food x coord
+  v1 := 10
+  v2 := 10
+  i  := shrimp-fried
+  sprite v1 v2 7
+
   loop
     steer-arm1
     move-arm1
-    if vf == 0 then
+    check-collision
   again
-
-  game-over
 ;
 
 : steer-arm1
@@ -159,6 +168,50 @@
   arm1_y += v2
   draw-arm1
 
+;
+
+: collect-food
+  i := shrimp-collected
+  load v0
+  if v0 == TRUE then vf := 0
+  if v0 == TRUE then return
+  # since the shrimp has laready been collected we don't need to
+  # check for collisions with it
+
+  # draw the shrimp twice - the first time we're guaranteed collisions
+  # and if an arm has hit th food the redraw will set vf appropriately
+  v1 := 10
+  i  := shrimp-fried
+  sprite v1 v1 7
+
+  v1 := 10
+  i  := shrimp-fried
+  sprite v1 v1 7
+
+  if vf == 1 begin
+    # the arm has hit the food! collect it
+    i  := shrimp-collected
+    v0 := TRUE
+    save v0
+
+    # and undraw it again
+    v1 := 10
+    i  := shrimp-fried
+    sprite v1 v1 7
+  end
+;
+
+: check-collision
+  if vf == 1 begin
+    # flash all foods that haven't been collected
+    # and collect food that triggered conflict
+    collect-food
+
+    # if food was collected the game shouldn't end yet
+    if vf == 1 then return
+
+    game-over
+  end
 ;
 
 : game-over
