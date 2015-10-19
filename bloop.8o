@@ -68,6 +68,7 @@
 
   # game-state
   : arm1-direction -3
+  : arm2-direction  3
 
   : shrimp-collected 0
 
@@ -82,6 +83,11 @@
 : draw-arm1
   i := dot
   sprite arm1_x arm1_y 1
+;
+
+: draw-arm2
+  i := dot
+  sprite arm2_x arm2_y 1
 ;
 
 
@@ -103,6 +109,11 @@
   arm1_y := 31
   draw-arm1
 
+  # start arm2 (right) below the head
+  arm2_x := 66
+  arm2_y := 31
+  draw-arm2
+
 # v1 -> test food x coord
   v1 := 10
   v2 := 10
@@ -112,6 +123,10 @@
   loop
     steer-arm1
     move-arm1
+    check-collision
+
+    steer-arm2
+    move-arm2
     check-collision
   again
 ;
@@ -124,13 +139,13 @@
 
 # v1 -> new arm direction
   v2 := 0
-  input := 5 #w
+  input := 0x2 #2
   if input key then v2 += UP
-  input := 7 #a
+  input := 0x4 #q
   if input key then v2 += LEFT
-  input := 8 #s
+  input := 0x5 #w
   if input key then v2 += DOWN
-  input := 9 #d
+  input := 0x6 #e
   if input key then v2 += RIGHT
 
 # can't stop won't stop
@@ -138,6 +153,31 @@
 
   v0 := v2
   i  := arm1-direction
+  save v0
+;
+
+: steer-arm2
+  :alias input v1
+
+  i := arm2-direction
+  load v0
+
+# v1 -> new arm direction
+  v2 := 0
+  input := 0x8 #s
+  if input key then v2 += UP
+  input := 0xA #z
+  if input key then v2 += LEFT
+  input := 0x0 #x
+  if input key then v2 += DOWN
+  input := 0xB #c
+  if input key then v2 += RIGHT
+
+# can't stop won't stop
+  if v2 == 0 then return
+
+  v0 := v2
+  i  := arm2-direction
   save v0
 ;
 
@@ -168,6 +208,34 @@
   arm1_y += v2
   draw-arm1
 
+;
+
+: move-arm2
+# v1 -> dx
+  v1 := 0
+# v2 -> dy
+  v2 := 0
+
+  i := arm2-direction
+  load v0
+
+  if v0 == UPLEFT    then v1 += -1
+  if v0 == LEFT      then v1 += -1
+  if v0 == DOWNLEFT  then v1 += -1
+  if v0 == UPRIGHT   then v1 +=  1
+  if v0 == RIGHT     then v1 +=  1
+  if v0 == DOWNRIGHT then v1 +=  1
+
+  if v0 == UPLEFT    then v2 += -1
+  if v0 == UP        then v2 += -1
+  if v0 == UPRIGHT   then v2 += -1
+  if v0 == DOWNLEFT  then v2 +=  1
+  if v0 == DOWN      then v2 +=  1
+  if v0 == DOWNRIGHT then v2 +=  1
+
+  arm2_x += v1
+  arm2_y += v2
+  draw-arm2
 ;
 
 : collect-food
