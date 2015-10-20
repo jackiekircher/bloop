@@ -151,6 +151,11 @@
 # can't stop won't stop
   if v2 == 0 then return
 
+# no going back
+  v1 := v0
+  v1 += v2
+  if v1 == 0 then return
+
   v0 := v2
   i  := arm1-direction
   save v0
@@ -176,48 +181,45 @@
 # can't stop won't stop
   if v2 == 0 then return
 
+# no going back
+  v1 := v0
+  v1 += v2
+  if v1 == 0 then return
+
   v0 := v2
   i  := arm2-direction
   save v0
 ;
 
 : move-arm1
-# v1 -> dx
-  v1 := 0
-# v2 -> dy
-  v2 := 0
-
   i := arm1-direction
   load v0
-
-  if v0 == UPLEFT    then v1 += -1
-  if v0 == LEFT      then v1 += -1
-  if v0 == DOWNLEFT  then v1 += -1
-  if v0 == UPRIGHT   then v1 +=  1
-  if v0 == RIGHT     then v1 +=  1
-  if v0 == DOWNRIGHT then v1 +=  1
-
-  if v0 == UPLEFT    then v2 += -1
-  if v0 == UP        then v2 += -1
-  if v0 == UPRIGHT   then v2 += -1
-  if v0 == DOWNLEFT  then v2 +=  1
-  if v0 == DOWN      then v2 +=  1
-  if v0 == DOWNRIGHT then v2 +=  1
+  v1 := 0
+  v2 := 0
+  translate-movement
 
   arm1_x += v1
   arm1_y += v2
   draw-arm1
-
 ;
 
 : move-arm2
-# v1 -> dx
-  v1 := 0
-# v2 -> dy
-  v2 := 0
-
   i := arm2-direction
   load v0
+  v1 := 0
+  v2 := 0
+  translate-movement
+
+  arm2_x += v1
+  arm2_y += v2
+  draw-arm2
+;
+
+: translate-movement
+  # arguments:
+  #   v0 -> direction
+  #   v1 -> x
+  #   v2 -> y
 
   if v0 == UPLEFT    then v1 += -1
   if v0 == LEFT      then v1 += -1
@@ -232,10 +234,6 @@
   if v0 == DOWNLEFT  then v2 +=  1
   if v0 == DOWN      then v2 +=  1
   if v0 == DOWNRIGHT then v2 +=  1
-
-  arm2_x += v1
-  arm2_y += v2
-  draw-arm2
 ;
 
 : collect-food
