@@ -16,18 +16,21 @@
 : dot
   0x80
 
+: empty
+  0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
 # food
 : fish-left #7x3
-  0x30 0x4A 0x84 0x7A
+  0x30 0x4A 0x84 0x7A 0x00 0x00 0x00
 : fish-right #7x4
-  0x18 0xA4 0x42 0xBC
+  0x18 0xA4 0x42 0xBC 0x00 0x00 0x00
 : speck #3x3
-  0x40 0xA0 0x40
+  0x40 0xA0 0x40 0x00 0x00 0x00 0x00
 : sushi #4x4
-  0x60 0x90 0xF0 0x60
-: shrimp-fried #7x7
+  0x60 0x90 0xF0 0x60 0x00 0x00 0x00
+: shrimp-fried-left #7x7
   0x60 0x90 0x90 0x68 0x18 0x06 0x04
-: shrimp-fried-flipped #7x7
+: shrimp-fried-right #7x7
   0x04 0x06 0x18 0x68 0x90 0x90 0x60
 : donut #7x7
   0x38 0x44 0x92 0xAA 0x92 0x44 0x38
@@ -36,6 +39,35 @@
   0x92 0x80 0x92 0x80 0xA2 0x80 0xA4 0x80
   0x99 0x00 0x81 0x00 0xFF 0x80
 
+  :const FISHLEFT         1
+  :const FIGHRIGHT        2
+  :const SPECK            3
+  :const SUSHI            4
+  :const SHRIMPFRIEDLEFT  5
+  :const SHRIMPFRIEDRIGHT 6
+  :const DONUT            7
+  :const CHIPS            8
+
+: board
+  # food left
+  0x00
+: board-food
+  # type ---  taken --- x pos --- y pos
+    0x05      0x00      0x0A      0x0A
+    0x07      0x00      0x70      0x0A
+    0x00      0x00      0x00      0x00
+    0xFF      0x00      0x00      0x00
+
+: food-table
+  i := empty              return
+  i := fish-left          return
+  i := fish-right         return
+  i := speck              return
+  i := sushi              return
+  i := shrimp-fried-left  return
+  i := shrimp-fried-right return
+  i := donut              return
+;
 
 
 #-- setup --#
@@ -90,6 +122,33 @@
   sprite arm2_x arm2_y 1
 ;
 
+: draw-board
+  i  := board-food
+  load v3
+  # v0 -> food-type
+  # v1 -> food-taken
+  # v2 -> food-x
+  # v3 -> food-y
+
+  v4 := 0
+  loop
+    while v0 != 0xFF
+      v0 <<= v0
+      v0 <<= v0
+      select-food
+      sprite v2 v3 7
+
+      v4 += 4
+      i  := board-food
+      i  += v4
+      load v3
+  again
+;
+
+: select-food
+  jump0 food-table
+;
+
 
 # -- main --#
 
@@ -115,10 +174,7 @@
   draw-arm2
 
 # v1 -> test food x coord
-  v1 := 10
-  v2 := 10
-  i  := shrimp-fried
-  sprite v1 v2 7
+  draw-board
 
   loop
     steer-arm1
@@ -247,11 +303,11 @@
   # draw the shrimp twice - the first time we're guaranteed collisions
   # and if an arm has hit th food the redraw will set vf appropriately
   v1 := 10
-  i  := shrimp-fried
+  i  := shrimp-fried-left
   sprite v1 v1 7
 
   v1 := 10
-  i  := shrimp-fried
+  i  := shrimp-fried-left
   sprite v1 v1 7
 
   if vf == 1 begin
@@ -262,7 +318,7 @@
 
     # and undraw it again
     v1 := 10
-    i  := shrimp-fried
+    i  := shrimp-fried-left
     sprite v1 v1 7
   end
 ;
