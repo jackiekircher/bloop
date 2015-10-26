@@ -39,25 +39,6 @@
   0x92 0x80 0x92 0x80 0xA2 0x80 0xA4 0x80
   0x99 0x00 0x81 0x00 0xFF 0x80
 
-  :const FISHLEFT         1
-  :const FIGHRIGHT        2
-  :const SPECK            3
-  :const SUSHI            4
-  :const SHRIMPFRIEDLEFT  5
-  :const SHRIMPFRIEDRIGHT 6
-  :const DONUT            7
-  :const CHIPS            8
-
-: board
-  # food left
-  0x00
-: board-food
-  # type ---  taken --- x pos --- y pos
-    0x05      0x00      0x0A      0x0A
-    0x07      0x00      0x70      0x0A
-    0x00      0x00      0x00      0x00
-    0xFF      0x00      0x00      0x00
-
 : food-table
   i := empty              return
   i := fish-left          return
@@ -68,6 +49,34 @@
   i := shrimp-fried-right return
   i := donut              return
 ;
+
+  :const FISHLEFT         1
+  :const FIGHRIGHT        2
+  :const SPECK            3
+  :const SUSHI            4
+  :const SHRIMPFRIEDLEFT  5
+  :const SHRIMPFRIEDRIGHT 6
+  :const DONUT            7
+  :const CHIPS            8
+
+: board
+  0x00
+
+: board-food
+  # type ---  taken --- x pos --- y pos
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0xFF      0x00      0x00      0x00
 
 
 #-- setup --#
@@ -98,11 +107,15 @@
   :const FALSE 0
   :const TRUE  1
 
+  :const ARM1XOFFSET 0
+  :const ARM1YOFFSET 7
+  :const ARM2XOFFSET 6
+  :const ARM2YOFFSET 7
+
   # game-state
   : arm1-direction -3
   : arm2-direction  3
 
-  : shrimp-collected 0
 
 : setup
   hires
@@ -152,31 +165,79 @@
 ;
 
 
+# -- levels -- #
+
+: level-1
+  # food-counter
+  0x04
+
+  # starting-position
+  0x3C 0x18
+
+: level-1-food
+  # type ---  taken --- x pos --- y pos
+    0x05      0x00      0x0A      0x0A
+    0x07      0x00      0x70      0x0A
+    0x04      0x00      0x16      0x20
+    0x02      0x00      0x56      0x1B
+    0xFF      0x00      0x00      0x00
+
+: create-level-1
+  clear
+
+  i := level-1
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := board
+  save v0
+
+
+  # draw the octopus head
+  i := octopus-head
+  sprite v1 v2 7
+
+  # start arm1 (left) below the head
+  v2 += ARM1YOFFSET
+  arm1_x := v1
+  arm1_y := v2
+  draw-arm1
+
+  # start arm2 (right) below the head
+  v1 += ARM2XOFFSET
+  arm2_x := v1
+  arm2_y := v2
+  draw-arm2
+
+  # load the level 1 food into the board
+  i  := level-1-food
+  load v3
+
+  v4 := 0
+  loop
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+
+      v4 += 4
+      i  := level-1-food
+      i  += v4
+      load v3
+  again
+
+  draw-board
+;
+
+
 # -- main --#
 
 : main
   setup
 
-  # draw the octopus head
-  # v1 -> x coordinate
-  # v2 -> y coordinate
-  v1 := 60
-  v2 := 24
-  i  := octopus-head
-  sprite v1 v2 7
-
-  # start arm1 (left) below the head
-  arm1_x := 60
-  arm1_y := 31
-  draw-arm1
-
-  # start arm2 (right) below the head
-  arm2_x := 66
-  arm2_y := 31
-  draw-arm2
-
-# v1 -> test food x coord
-  draw-board
+  create-level-1
 
   loop
     steer-arm1
