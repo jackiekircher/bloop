@@ -133,10 +133,12 @@
   v4 := 0
   loop
     while v0 != 0xFF
-      v0 <<= v0
-      v0 <<= v0
-      select-food
-      sprite v2 v3 7
+      if v1 == 0 begin
+        v0 <<= v0
+        v0 <<= v0
+        select-food
+        sprite v2 v3 7
+      end
 
       v4 += 4
       i  := board-food
@@ -293,34 +295,50 @@
 ;
 
 : collect-food
-  i := shrimp-collected
-  load v0
-  if v0 == TRUE then vf := 0
-  if v0 == TRUE then return
-  # since the shrimp has laready been collected we don't need to
-  # check for collisions with it
+  i  := board-food
+  load v3
 
-  # draw the shrimp twice - the first time we're guaranteed collisions
-  # and if an arm has hit th food the redraw will set vf appropriately
-  v1 := 10
-  i  := shrimp-fried-left
-  sprite v1 v1 7
+  v4 := 0
+  v5 := 0
+  loop
+    while v0 != 0xFF
+      if v1 == 0 begin
+        # draw the food twice - the first time we're guaranteed
+        # collisions and if an arm has hit the food the redraw
+        # will set vf appropriately
+        v0 <<= v0
+        v0 <<= v0
+        select-food
+        sprite v2 v3 7
+        sprite v2 v3 7
 
-  v1 := 10
-  i  := shrimp-fried-left
-  sprite v1 v1 7
+        if vf == 1 begin
+          v5 := 1
 
-  if vf == 1 begin
-    # the arm has hit the food! collect it
-    i  := shrimp-collected
-    v0 := TRUE
-    save v0
+          # the arm has hit the food! collect it
+          v0 >>= v0
+          v0 >>= v0
+          v1 := TRUE
+          i  := board-food
+          i  += v4
+          save v1
 
-    # and undraw it again
-    v1 := 10
-    i  := shrimp-fried-left
-    sprite v1 v1 7
-  end
+          # and undraw it again
+          v0 <<= v0
+          v0 <<= v0
+          select-food
+          sprite v2 v3 7
+        end
+      end
+
+      v4 += 4
+      i  := board-food
+      i  += v4
+      load v3
+  again
+
+  vf := 0
+  if v5 == 1 then vf := 1
 ;
 
 : check-collision
