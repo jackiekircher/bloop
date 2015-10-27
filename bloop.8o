@@ -142,6 +142,15 @@
   arm2_x := v1
   arm2_y := v2
   draw-arm2
+
+  # reset arm directions
+  i  := arm1-direction
+  v0 := LEFT
+  save v0
+
+  i  := arm2-direction
+  v0 := RIGHT
+  save v0
 ;
 
 # draws the tentacle
