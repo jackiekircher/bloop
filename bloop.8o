@@ -573,7 +573,7 @@
     # if food was collected the game shouldn't end yet
     if vf == 1 then return
 
-    game-over
+    restart-level
   end
 ;
 
@@ -595,7 +595,17 @@
   save v0
 
   if v0 == 2 then create-level-2
-  if v0 == 3 then game-over
+  if v0 == 3 then victory
+;
+
+: restart-level
+  countdown
+
+  i  := current-level
+  load v0
+
+  if v0 == 1 then create-level-1
+  if v0 == 2 then create-level-2
 ;
 
 : countdown
@@ -611,19 +621,6 @@
         v0 := delay
         if v0 != 0 then
       again
-  again
-;
-
-: game-over
-  loop
-    draw-arm1
-    draw-arm2
-    v0    := 10
-    delay := v0
-    loop
-      v0 := delay
-      if v0 != 0 then
-    again
   again
 ;
 
@@ -660,4 +657,8 @@
 ;
 
 : versus
+;
+
+: victory
+  exit
 ;
