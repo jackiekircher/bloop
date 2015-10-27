@@ -59,9 +59,6 @@
   :const DONUT            7
   :const CHIPS            8
 
-: board
-  0x00
-
 : board-food
   # type ---  taken --- x pos --- y pos
     0x00      0x01      0x00      0x00
@@ -115,7 +112,8 @@
   # game-state
   : arm1-direction -3
   : arm2-direction  3
-
+  : current-level   1
+  : food-remaining  4
 
 : setup
   hires
@@ -123,6 +121,28 @@
 
 
 #-- drawing --#
+
+: draw-octopus
+  # arguments:
+  #   v1 -> octopus x pos
+  #   v2 -> octopus y pos
+
+  # draw the octopus head
+  i := octopus-head
+  sprite v1 v2 7
+
+  # start arm1 (left) below the head
+  v2 += ARM1YOFFSET
+  arm1_x := v1
+  arm1_y := v2
+  draw-arm1
+
+  # start arm2 (right) below the head
+  v1 += ARM2XOFFSET
+  arm2_x := v1
+  arm2_y := v2
+  draw-arm2
+;
 
 # draws the tentacle
 : draw-arm1
@@ -191,28 +211,13 @@
   # v1 -> starting x pos
   # v2 -> starting y pos
 
-  i := board
+  i := food-remaining
   save v0
 
-
-  # draw the octopus head
-  i := octopus-head
-  sprite v1 v2 7
-
-  # start arm1 (left) below the head
-  v2 += ARM1YOFFSET
-  arm1_x := v1
-  arm1_y := v2
-  draw-arm1
-
-  # start arm2 (right) below the head
-  v1 += ARM2XOFFSET
-  arm2_x := v1
-  arm2_y := v2
-  draw-arm2
+  draw-octopus
 
   # load the level 1 food into the board
-  i  := level-1-food
+  i := level-1-food
   load v3
 
   v4 := 0
@@ -224,6 +229,57 @@
 
       v4 += 4
       i  := level-1-food
+      i  += v4
+      load v3
+  again
+
+  draw-board
+;
+
+: level-2
+  # food-counter
+  0x06
+
+  # starting-position
+  0x10 0x06
+
+: level-2-food
+  # type ---  taken --- x pos --- y pos
+    0x04      0x00      0x0A      0x24
+    0x04      0x00      0x12      0x24
+    0x04      0x00      0x1A      0x24
+    0x04      0x00      0x22      0x24
+    0x04      0x00      0x2A      0x24
+    0x04      0x00      0x32      0x24
+    0xFF      0x00      0x00      0x00
+
+: create-level-2
+  clear
+
+  i := level-2
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the level 1 food into the board
+  i := level-2-food
+  load v2
+
+  v4 := 0
+  loop
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+
+      v4 += 4
+      i  := level-2-food
       i  += v4
       load v3
   again
@@ -247,6 +303,8 @@
     steer-arm2
     move-arm2
     check-collision
+
+    next-level
   again
 ;
 
@@ -389,6 +447,12 @@
           v0 <<= v0
           select-food
           sprite v2 v3 7
+
+          i  := food-remaining
+          load v0
+          v0 += -1
+          i  := food-remaining
+          save v0
         end
       end
 
@@ -413,6 +477,22 @@
 
     game-over
   end
+;
+
+: next-level
+  i := food-remaining
+  load v0
+  if v0 > 0 then return
+
+  i  := current-level
+  load v0
+
+  v0 += 1
+  i  := current-level
+  save v0
+
+  if v0 == 2 then create-level-2
+  if v0 == 3 then game-over
 ;
 
 : game-over
