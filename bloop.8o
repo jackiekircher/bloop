@@ -1,9 +1,10 @@
-#----------------------------#
+#-------------------------------------#
 #  bloop
 #  author: jackie kircher
-#----------------------------#
+#-------------------------------------#
 
-#-- sprites --#
+#-- sprites --------------------------#
+
 : octopus #11x12 (SUPERCHIP)
   0x0F 0x00 0x1F 0x80 0x1F 0x80 0x1F 0x80
   0x1F 0x80 0x0A 0x80 0x0F 0x00 0x1A 0x80
@@ -59,24 +60,8 @@
   :const DONUT            7
   :const CHIPS            8
 
-: board-food
-  # type ---  taken --- x pos --- y pos
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0x00      0x01      0x00      0x00
-    0xFF      0x00      0x00      0x00
 
-
-#-- setup --#
+#-- setup ----------------------------#
 
   # registers
   :alias arm1_x va
@@ -115,12 +100,28 @@
   : current-level   1
   : food-remaining  4
 
+  : board-food
+  # type ---  taken --- x pos --- y pos
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0x00      0x01      0x00      0x00
+    0xFF      0x00      0x00      0x00
+
 : setup
   hires
 ;
 
 
-#-- drawing --#
+#-- drawing --------------------------#
 
 : draw-octopus
   # arguments:
@@ -194,7 +195,7 @@
 ;
 
 
-# -- levels -- #
+#-- levels ---------------------------#
 
 : level-1
   # food-counter
@@ -301,25 +302,7 @@
 ;
 
 
-# -- main --#
-
-: main
-  setup
-
-  create-level-1
-
-  loop
-    steer-arm1
-    move-arm1
-    check-collision
-
-    steer-arm2
-    move-arm2
-    check-collision
-
-    next-level
-  again
-;
+#-- movement -------------------------#
 
 : steer-arm1
   :alias input v1
@@ -492,6 +475,9 @@
   end
 ;
 
+
+#-- game progression -----------------#
+
 : next-level
   i := food-remaining
   load v0
@@ -538,3 +524,25 @@
     again
   again
 ;
+
+
+#-- main -----------------------------#
+
+: main
+  setup
+
+  create-level-1
+
+  loop
+    steer-arm1
+    move-arm1
+    check-collision
+
+    steer-arm2
+    move-arm2
+    check-collision
+
+    next-level
+  again
+;
+
