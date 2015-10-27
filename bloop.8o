@@ -243,6 +243,8 @@
   again
 
   draw-board
+
+  countdown
 ;
 
 : level-2
@@ -294,6 +296,8 @@
   again
 
   draw-board
+
+  countdown
 ;
 
 
@@ -493,6 +497,8 @@
   load v0
   if v0 > 0 then return
 
+  countdown
+
   i  := current-level
   load v0
 
@@ -504,9 +510,26 @@
   if v0 == 3 then game-over
 ;
 
+: countdown
+  v1 := 0
+  loop
+    v1 += 1
+    while v1 < 7
+      draw-arm1
+      draw-arm2
+      v0    := 30
+      delay := v0
+      loop
+        v0 := delay
+        if v0 != 0 then
+      again
+  again
+;
+
 : game-over
   loop
     draw-arm1
+    draw-arm2
     v0    := 10
     delay := v0
     loop
