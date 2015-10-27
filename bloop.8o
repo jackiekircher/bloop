@@ -20,6 +20,21 @@
 : empty
   0x00 0x00 0x00 0x00 0x00 0x00 0x00
 
+: one #3x7
+  0x20 0x60 0x20 0x20 0x20 0x20 0x20
+: two #4x7
+  0x60 0x90 0x10 0x20 0x40 0x80 0xF0
+
+: player-left #16x10 (SUPERCHIP)
+  0x07 0x80 0x04 0x80 0x04 0x80 0x07 0x00
+  0x04 0x00 0x05 0x75 0x05 0x55 0x05 0x77
+  0x15 0x11 0x09 0xC1 0x00 0x02 0x00 0x00
+  0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+: player-right #7x11
+  0x00 0x00 0x00 0x00 0x06 0x05 0x74 0x54
+  0x60 0x40 0x70 0x00 0x00 0x00 0x00
+
 # food
 : fish-left #7x3
   0x30 0x4A 0x84 0x7A 0x00 0x00 0x00
@@ -97,6 +112,7 @@
   # game-state
   : arm1-direction -3
   : arm2-direction  3
+  : game-mode       1
   : current-level   1
   : food-remaining  4
 
@@ -120,8 +136,92 @@
   hires
 ;
 
+: menu-screen
+  draw-menu-screen
+
+  v3 := 0xC
+  v4 := 0xD
+  loop
+    if v4 key then select-player
+    if v3 -key then
+  again
+;
+
+: select-player
+  i := game-mode
+  load v0
+
+  # toggle the player select sushi
+  if v0 == 1 begin
+    v1 := 47
+    v2 := 32
+    i  := sushi
+    sprite v1 v2 4
+
+    v1 := 47
+    v2 := 46
+    i  := sushi
+    sprite v1 v2 4
+  end
+
+  if v0 == 2 begin
+    v1 := 47
+    v2 := 46
+    i  := sushi
+    sprite v1 v2 4
+
+    v1 := 47
+    v2 := 32
+    i  := sushi
+    sprite v1 v2 4
+  end
+
+  # toggle the game mode
+  if v0 == 1 then v1 := 2
+  if v0 == 2 then v1 := 1
+  i  := game-mode
+  v0 := v1
+  save v0
+
+  # delay to avoid double inputs
+  v0    := 10
+  delay := v0
+  loop
+    v0 := delay
+    if v0 != 0 then
+  again
+;
+
 
 #-- drawing --------------------------#
+
+: draw-menu-screen
+
+    v1 := 55
+    v2 := 30
+    i  := one
+    sprite v1 v2 7
+    i  := player-left
+    sprite v1 v2 0
+    i  := player-right
+    v1 += 16
+    sprite v1 v2 15
+
+    v1 := 55
+    v2 := 44
+    i  := two
+    sprite v1 v2 7
+    i  := player-left
+    sprite v1 v2 0
+    i  := player-right
+    v1 += 16
+    sprite v1 v2 15
+
+    v1 := 47
+    v2 := 32
+    i  := sushi
+    sprite v1 v2 4
+;
 
 : draw-octopus
   # arguments:
@@ -531,6 +631,8 @@
 : main
   setup
 
+  menu-screen
+
   create-level-1
 
   loop
@@ -545,4 +647,3 @@
     next-level
   again
 ;
-
