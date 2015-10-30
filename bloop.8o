@@ -651,12 +651,22 @@
 #-- game progression -----------------#
 
 : next-level
+  v9 := 1
+  v1 := 1
+  v2 := 3
+  v3 := 0xF
+  if v1 -key then v9 := 0
+  if v2 -key then v9 := 0
+  if v3 -key then v9 := 0
+  if v9 == 1 then jump skip-level
+
   i := food-remaining
   load v0
   if v0 > 0 then return
 
   countdown
 
+: skip-level
   i  := current-level
   load v0
 
