@@ -416,20 +416,17 @@
   draw-octopus
 
   # load the level 1 food into the board
-  i := level-1-food
-  load v3
-
-  v4 := 0
+  v4 := -4
   loop
+    v4 += 4
+    i  := level-1-food
+    i  += v4
+    load v3
+
     while v0 != 0xFF
       i := board-food
       i += v4
       save v3
-
-      v4 += 4
-      i  := level-1-food
-      i  += v4
-      load v3
   again
 
   draw-board
@@ -466,20 +463,17 @@
   draw-octopus
 
   # load the level 1 food into the board
-  i := level-2-food
-  load v3
-
-  v4 := 0
+  v4 := -4
   loop
+    v4 += 4
+    i  := level-2-food
+    i  += v4
+    load v3
+
     while v0 != 0xFF
       i := board-food
       i += v4
       save v3
-
-      v4 += 4
-      i  := level-2-food
-      i  += v4
-      load v3
   again
 
   draw-board
@@ -515,20 +509,17 @@
   draw-octopus
 
   # load the level 1 food into the board
-  i := level-3-food
-  load v3
-
-  v4 := 0
+  v4 := -4
   loop
+    v4 += 4
+    i  := level-3-food
+    i  += v4
+    load v3
+
     while v0 != 0xFF
       i := board-food
       i += v4
       save v3
-
-      v4 += 4
-      i  := level-3-food
-      i  += v4
-      load v3
   again
 
   draw-board
