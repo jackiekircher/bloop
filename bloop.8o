@@ -173,6 +173,23 @@
   hires
 ;
 
+: sweep-board
+  v4 := -4
+  loop
+    v4 += 4
+    while v4 < 48
+      v0 := 0x00
+      v1 := 0x01
+      v2 := 0x00
+      v3 := 0x00
+      i  := board-food
+      i  += v4
+      save v3
+  again
+
+ clear
+;
+
 : menu-screen
   draw-menu-screen
 
@@ -385,8 +402,6 @@
     0xFF      0x00      0x00      0x00
 
 : create-level-1
-  clear
-
   i := level-1
   load v2
   # v0 -> number of foods
@@ -439,8 +454,6 @@
     0xFF      0x00      0x00      0x00
 
 : create-level-2
-  clear
-
   i := level-2
   load v2
   # v0 -> number of foods
@@ -465,6 +478,57 @@
 
       v4 += 4
       i  := level-2-food
+      i  += v4
+      load v3
+  again
+
+  draw-board
+
+  countdown
+;
+
+: level-3
+  # food-counter
+  0x06
+
+  # starting-position
+  0x3C 0x18
+
+: level-3-food
+  # type ---  taken --- x pos --- y pos
+    0x02      0x00      0x14      0x08
+    0x04      0x00      0x02      0x22
+    0x03      0x00      0x44      0x17
+    0x01      0x00      0x3A      0x32
+    0x01      0x00      0x60      0x0B
+    0x06      0x00      0x6C      0x36
+    0xFF      0x00      0x00      0x00
+
+: create-level-3
+  i := level-3
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the level 1 food into the board
+  i := level-3-food
+  load v3
+
+  v4 := 0
+  loop
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+
+      v4 += 4
+      i  := level-3-food
       i  += v4
       load v3
   again
@@ -668,6 +732,8 @@
   countdown
 
 : skip-level
+  sweep-board
+
   i  := current-level
   load v0
 
@@ -676,17 +742,20 @@
   save v0
 
   if v0 == 2 then create-level-2
-  if v0 == 3 then victory
+  if v0 == 3 then create-level-3
+  if v0 == 4 then victory
 ;
 
 : restart-level
   countdown
+  sweep-board
 
   i  := current-level
   load v0
 
   if v0 == 1 then create-level-1
   if v0 == 2 then create-level-2
+  if v0 == 3 then create-level-3
 ;
 
 : countdown
@@ -722,6 +791,7 @@
 
 : puzzle-mode
 
+  clear
   create-level-1
 
   loop
