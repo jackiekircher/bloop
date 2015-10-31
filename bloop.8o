@@ -902,16 +902,16 @@
   6
 
   # starting-position
-  58 33
+  59 30
 
 : level-8-food
   # type - taken - x pos - y pos
-    5      0       22      14
-    6      0       54      51
-    5      0       70      6
-    6      0       70      20
-    5      0       107     4
-    6      0       1       25
+    1      0       24      7
+    2      0       98      7
+    1      0       116     24
+    2      0       6       46
+    7      0       61      53
+    6      0       114     7
     0xFF   0       0       0
 
 : create-level-8
@@ -931,6 +931,145 @@
   loop
     v4 += 4
     i  := level-8-food
+    i  += v4
+    load v3
+
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+  again
+
+  #draw the walls
+  i  := horizontal-line-8
+  v1 := 110
+  v4 := -1
+  loop
+    v4 += 1
+    if v4 == 2 then i := horizontal-line-4
+    while v4 < 3
+      v2 := 17
+      sprite v1 v2 1
+      v2 := 33
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  i  := horizontal-line-8
+  v1 := 126
+  v4 := -1
+  loop
+    v4 += 1
+    if v4 == 2 then i := horizontal-line-4
+    while v4 < 3
+      v2 := 40
+      sprite v1 v2 1
+      v2 := 56
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  i  := horizontal-line-8
+  v1 := 20
+  v2 := 17
+  sprite v1 v2 1
+  v1 := 28
+  sprite v1 v2 1
+
+  v1 := 93
+  v2 := 17
+  sprite v1 v2 1
+  v1 := 101
+  sprite v1 v2 1
+
+  v1 := 56
+  v2 := 48
+  sprite v1 v2 1
+  v1 := 64
+  sprite v1 v2 1
+
+  i  := vertical-line
+  v1 := 19
+  v2 := 62
+  sprite v1 v2 15
+  v2 := 13
+  sprite v1 v2 5
+
+  v1 := 36
+  v2 := 62
+  sprite v1 v2 15
+  v2 := 13
+  sprite v1 v2 5
+
+  v1 := 92
+  v2 := 62
+  sprite v1 v2 15
+  v2 := 13
+  sprite v1 v2 5
+
+  v1 := 109
+  v2 := 62
+  sprite v1 v2 15
+  v2 := 13
+  sprite v1 v2 15
+  v2 := 28
+  sprite v1 v2 6
+
+  v1 := 18
+  v2 := 40
+  sprite v1 v2 15
+  v2 := 55
+  sprite v1 v2 2
+
+  v1 := 55
+  v2 := 48
+  sprite v1 v2 15
+  v2 := 63
+  sprite v1 v2 4
+
+  v1 := 72
+  v2 := 48
+  sprite v1 v2 15
+  v2 := 63
+  sprite v1 v2 4
+
+  draw-board
+;
+
+: level-9
+  # food-counter
+  6
+
+  # starting-position
+  58 33
+
+: level-9-food
+  # type - taken - x pos - y pos
+    5      0       22      14
+    6      0       54      51
+    5      0       70      6
+    6      0       70      20
+    5      0       107     4
+    6      0       1       25
+    0xFF   0       0       0
+
+: create-level-9
+  i := level-9
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the food into the board
+  v4 := -4
+  loop
+    v4 += 4
+    i  := level-9-food
     i  += v4
     load v3
 
@@ -1077,145 +1216,6 @@
   v2 := 56
   v1 := 68
   sprite v1 v2 8
-
-  draw-board
-;
-
-: level-9
-  # food-counter
-  6
-
-  # starting-position
-  59 30
-
-: level-9-food
-  # type - taken - x pos - y pos
-    1      0       24      7
-    2      0       98      7
-    1      0       116     24
-    2      0       6       46
-    7      0       61      53
-    6      0       114     7
-    0xFF   0       0       0
-
-: create-level-9
-  i := level-9
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-9-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  i  := horizontal-line-8
-  v1 := 110
-  v4 := -1
-  loop
-    v4 += 1
-    if v4 == 2 then i := horizontal-line-4
-    while v4 < 3
-      v2 := 17
-      sprite v1 v2 1
-      v2 := 33
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  i  := horizontal-line-8
-  v1 := 126
-  v4 := -1
-  loop
-    v4 += 1
-    if v4 == 2 then i := horizontal-line-4
-    while v4 < 3
-      v2 := 40
-      sprite v1 v2 1
-      v2 := 56
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  i  := horizontal-line-8
-  v1 := 20
-  v2 := 17
-  sprite v1 v2 1
-  v1 := 28
-  sprite v1 v2 1
-
-  v1 := 93
-  v2 := 17
-  sprite v1 v2 1
-  v1 := 101
-  sprite v1 v2 1
-
-  v1 := 56
-  v2 := 48
-  sprite v1 v2 1
-  v1 := 64
-  sprite v1 v2 1
-
-  i  := vertical-line
-  v1 := 19
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 36
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 92
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 109
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 15
-  v2 := 28
-  sprite v1 v2 6
-
-  v1 := 18
-  v2 := 40
-  sprite v1 v2 15
-  v2 := 55
-  sprite v1 v2 2
-
-  v1 := 55
-  v2 := 48
-  sprite v1 v2 15
-  v2 := 63
-  sprite v1 v2 4
-
-  v1 := 72
-  v2 := 48
-  sprite v1 v2 15
-  v2 := 63
-  sprite v1 v2 4
 
   draw-board
 ;
