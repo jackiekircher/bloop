@@ -794,6 +794,105 @@
   draw-board
 ;
 
+: level-7
+  # food-counter
+  8
+
+  # starting-position
+  95 8
+
+: level-7-food
+  # type - taken - x pos - y pos
+    7      0       25      53
+    7      0       35      53
+    7      0       45      53
+    7      0       55      53
+    3      0       15      58
+    3      0       11      60
+    3      0       70      58
+    3      0       74      60
+    0xFF   0       0       0
+
+: create-level-7
+  i := level-7
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the food into the board
+  v4 := -4
+  loop
+    v4 += 4
+    i  := level-7-food
+    i  += v4
+    load v3
+
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+  again
+
+  #draw the walls
+  v1 := 20
+  i  := horizontal-line-8
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 6
+      v2 := 13
+      sprite v1 v2 1
+      v2 := 62
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 27
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 5
+      v2 := 20
+      sprite v1 v2 1
+      v2 := 40
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 21
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 5
+      v2 := 30
+      sprite v1 v2 1
+      v2 := 50
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v2 := 17
+  i  := vertical-line
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 3
+      v1 := 20
+      sprite v1 v2 15
+      v1 := 67
+      sprite v1 v2 15
+      v2 += 15
+  again
+
+  draw-board
+;
+
 
 #-- movement -------------------------#
 
@@ -1002,7 +1101,8 @@
   if v0 == 4 then create-level-4
   if v0 == 5 then create-level-5
   if v0 == 6 then create-level-6
-  if v0 == 7 then victory
+  if v0 == 7 then create-level-7
+  if v0 == 8 then victory
 ;
 
 : restart-level
@@ -1018,6 +1118,7 @@
   if v0 == 4 then create-level-4
   if v0 == 5 then create-level-5
   if v0 == 6 then create-level-6
+  if v0 == 7 then create-level-7
 ;
 
 : countdown
