@@ -402,17 +402,17 @@
 
 : level-1
   # food-counter
-  0x03
+  3
 
   # starting-position
-  0x3C 0x18
+  60 24
 
 : level-1-food
-  # type ---  taken --- x pos --- y pos
-    0x05      0x00      0x0A      0x0A
-    0x07      0x00      0x70      0x0A
-    0x02      0x00      0x3C      0x30
-    0xFF      0x00      0x00      0x00
+  # type - taken - x pos - y pos
+    5      0       10      10
+    7      0       112     10
+    2      0       60      48
+    0xFF   0       0       0
 
 : create-level-1
   i := level-1
@@ -445,21 +445,21 @@
 
 : level-2
   # food-counter
-  0x07
+  7
 
   # starting-position
-  0x10 0x06
+  16 6
 
 : level-2-food
-  # type ---  taken --- x pos --- y pos
-    0x04      0x00      0x2A      0x08
-    0x04      0x00      0x2A      0x16
-    0x04      0x00      0x2A      0x34
-    0x04      0x00      0x3A      0x34
-    0x04      0x00      0x4A      0x34
-    0x04      0x00      0x6A      0x10
-    0x04      0x00      0x6A      0x28
-    0xFF      0x00      0x00      0x00
+  # type - taken - x pos - y pos
+    4      0       42      8
+    4      0       42      22
+    4      0       42      52
+    4      0       58      52
+    4      0       74      52
+    4      0       106     16
+    4      0       106     40
+    0xFF   0       0       0
 
 : create-level-2
   i := level-2
@@ -492,20 +492,20 @@
 
 : level-3
   # food-counter
-  0x06
+  6
 
   # starting-position
-  0x3C 0x18
+  60 24
 
 : level-3-food
-  # type ---  taken --- x pos --- y pos
-    0x02      0x00      0x14      0x08
-    0x04      0x00      0x02      0x22
-    0x03      0x00      0x44      0x17
-    0x01      0x00      0x3A      0x32
-    0x01      0x00      0x60      0x0B
-    0x06      0x00      0x6C      0x36
-    0xFF      0x00      0x00      0x00
+  # type - taken - x pos - y pos
+    2      0       20      8
+    4      0       2       34
+    3      0       68      23
+    1      0       58      50
+    1      0       96      11
+    6      0       108     54
+    0xFF   0       0       0
 
 : create-level-3
   i := level-3
@@ -538,20 +538,20 @@
 
 : level-4
   # food-counter
-  0x06
+  6
 
   # starting-position
-  0x3C 0x04
+  60 4
 
 : level-4-food
-  # type ---  taken --- x pos --- y pos
-    0x01      0x00      0x1C      0x20
-    0x01      0x00      0x3C      0x20
-    0x01      0x00      0x5C      0x20
-    0x02      0x00      0x2C      0x2A
-    0x02      0x00      0x4C      0x2A
-    0x01      0x00      0x3C      0x35
-    0xFF      0x00      0x00      0x00
+  # type - taken - x pos - y pos
+    1      0       28      32
+    1      0       60      32
+    1      0       92      32
+    2      0       44      42
+    2      0       76      42
+    1      0       60      52
+    0xFF   0       0       0
 
 : create-level-4
   i := level-4
