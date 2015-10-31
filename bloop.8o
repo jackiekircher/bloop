@@ -426,7 +426,7 @@
 
   draw-octopus
 
-  # load the level 1 food into the board
+  # load the food into the board
   v4 := -4
   loop
     v4 += 4
@@ -473,7 +473,7 @@
 
   draw-octopus
 
-  # load the level 1 food into the board
+  # load the food into the board
   v4 := -4
   loop
     v4 += 4
@@ -519,7 +519,7 @@
 
   draw-octopus
 
-  # load the level 1 food into the board
+  # load the food into the board
   v4 := -4
   loop
     v4 += 4
@@ -565,7 +565,7 @@
 
   draw-octopus
 
-  # load the level 1 food into the board
+  # load the food into the board
   v4 := -4
   loop
     v4 += 4
@@ -589,6 +589,112 @@
       sprite v1 v2 1
       v1 += 8
   again
+
+  draw-board
+;
+
+: level-5
+  # food-counter
+  7
+
+  # starting-position
+  60 46
+
+: level-5-food
+  # type - taken - x pos - y pos
+    5      0       10      10
+    4      0       28      30
+    1      0       28      48
+    2      0       82      16
+    3      0       100     28
+    3      0       120     28
+    6      0       113     47
+    0xFF   0       0       0
+
+: create-level-5
+  i := level-5
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the food into the board
+  v4 := -4
+  loop
+    v4 += 4
+    i  := level-5-food
+    i  += v4
+    load v3
+
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+  again
+
+  #draw the walls
+  v1 := 18
+  v2 := 42
+  i  := horizontal-line-8
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 11
+      sprite v1 v2 1
+      v1 += 8
+  again
+  v1 := 106
+  i  := horizontal-line-4
+  sprite v1 v2 1
+
+  v1 := 0
+  v2 := 22
+  i  := horizontal-line-8
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 4
+      sprite v1 v2 1
+      v1 += 8
+  again
+  v1 := 32
+  i  := horizontal-line-4
+  sprite v1 v2 1
+
+  i  := vertical-line
+  v1 := 35
+  v2 := 61
+  sprite v1 v2 15
+  v2 := 12
+  sprite v1 v2 10
+
+  v1 := 18
+  v2 := 43
+  sprite v1 v2 15
+  v2 := 58
+  sprite v1 v2 9
+
+  v1 := 109
+  v2 := 43
+  sprite v1 v2 15
+  v2 := 58
+  sprite v1 v2 9
+
+  v1 := 64
+  v2 := 3
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 3
+      sprite v1 v2 13
+      v2 += 13
+  again
+
 
   draw-board
 ;
@@ -799,7 +905,8 @@
   if v0 == 2 then create-level-2
   if v0 == 3 then create-level-3
   if v0 == 4 then create-level-4
-  if v0 == 5 then victory
+  if v0 == 5 then create-level-5
+  if v0 == 6 then victory
 ;
 
 : restart-level
@@ -813,6 +920,7 @@
   if v0 == 2 then create-level-2
   if v0 == 3 then create-level-3
   if v0 == 4 then create-level-4
+  if v0 == 5 then create-level-5
 ;
 
 : countdown
