@@ -897,6 +897,190 @@
   draw-board
 ;
 
+: level-8
+  # food-counter
+  6
+
+  # starting-position
+  58 33
+
+: level-8-food
+  # type - taken - x pos - y pos
+    5      0       22      14
+    6      0       54      51
+    5      0       70      6
+    6      0       70      20
+    5      0       107     4
+    6      0       1       25
+    0xFF   0       0       0
+
+: create-level-8
+  i := level-8
+  load v2
+  # v0 -> number of foods
+  # v1 -> starting x pos
+  # v2 -> starting y pos
+
+  i := food-remaining
+  save v0
+
+  draw-octopus
+
+  # load the food into the board
+  v4 := -4
+  loop
+    v4 += 4
+    i  := level-8-food
+    i  += v4
+    load v3
+
+    while v0 != 0xFF
+      i := board-food
+      i += v4
+      save v3
+  again
+
+  #draw the walls
+  i  := horizontal-line-8
+  v1 := 36
+  v2 := 31
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 6
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 20
+  v2 := 46
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 11
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 19
+  v2 := 10
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 4
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 36
+  v2 := 20
+  sprite v1 v2 1
+  v1 := 44
+  sprite v1 v2 1
+  i  := dot
+  v1 := 51
+  sprite v1 v2 1
+
+  i  := horizontal-line-8
+  v1 := 0
+  v2 := 18
+  sprite v1 v2 1
+  v2 := 36
+  sprite v1 v2 1
+  v1 := 8
+  sprite v1 v2 1
+  v1 := 16
+  i  := horizontal-line-2
+  sprite v1 v2 1
+
+  i  := horizontal-line-8
+  v1 := 65
+  v2 := 16
+  sprite v1 v2 1
+  v1 := 73
+  sprite v1 v2 1
+  v1 := 81
+  i  := horizontal-line-2
+  sprite v1 v2 1
+
+  i  := horizontal-line-8
+  v1 := 102
+  v2 := 0
+  sprite v1 v2 1
+  v1 := 110
+  sprite v1 v2 1
+  v1 := 118
+  i  := horizontal-line-2
+  sprite v1 v2 1
+
+  i  := horizontal-line-8
+  v1 := 20
+  v2 := 55
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 3
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  v1 := 68
+  v2 := 55
+  v4 := -1
+  loop
+    v4 += 1
+    while v4 < 5
+      sprite v1 v2 1
+      v1 += 8
+  again
+
+  i  := vertical-line
+  v1 := 18
+  v2 := 10
+  sprite v1 v2 15
+  v2 := 25
+  sprite v1 v2 12
+
+  v1 := 36
+  v2 := 21
+  sprite v1 v2 10
+
+  v1 := 64
+  v2 := 0
+  sprite v1 v2 15
+  v2 := 15
+  sprite v1 v2 10
+
+  v1 := 83
+  v2 := 16
+  sprite v1 v2 15
+
+  v1 := 101
+  v2 := 0
+  sprite v1 v2 15
+  v2 := 15
+  sprite v1 v2 15
+  v2 := 30
+  sprite v1 v2 2
+
+  v1 := 120
+  v2 := 0
+  sprite v1 v2 15
+  v2 := 15
+  sprite v1 v2 15
+  v2 := 30
+  sprite v1 v2 2
+
+  v1 := 43
+  v2 := 47
+  sprite v1 v2 8
+  v2 := 56
+  v1 := 68
+  sprite v1 v2 8
+
+  draw-board
+;
+
 
 #-- movement -------------------------#
 
@@ -1106,7 +1290,8 @@
   if v0 == 5 then create-level-5
   if v0 == 6 then create-level-6
   if v0 == 7 then create-level-7
-  if v0 == 8 then victory
+  if v0 == 8 then create-level-8
+  if v0 == 9 then victory
 ;
 
 : restart-level
@@ -1123,6 +1308,7 @@
   if v0 == 5 then create-level-5
   if v0 == 6 then create-level-6
   if v0 == 7 then create-level-7
+  if v0 == 8 then create-level-8
 ;
 
 : countdown
