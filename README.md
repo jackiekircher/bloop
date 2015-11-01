@@ -9,13 +9,15 @@ frenzies for food.
 you must collect every piece of food to advance to the next level. can
 you beat all 9?
 
+for an extra challenge, try raising the clock speed above the defaul 60
+cycles/frame ;)
 
 ## controls
 ### menu
 
-- 4 (C) to start the game
+- 4 (C) to procede through menus and start the game
 
-- R (D) to toggle between game modes
+- R (D) to toggle between menu options
 
 ### left arm
 
