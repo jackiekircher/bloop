@@ -16,9 +16,19 @@
 
 #-- sprites --------------------------------#
 
-: octopus #11x12 (SUPERCHIP)
+: octopus               #11x13 (SUPERCHIP)
   0x1F 0x00 0x3F 0x80 0x3F 0x80 0x3F 0x80
   0x3F 0x80 0x1A 0x80 0x1F 0x00 0x0A 0x00
+  0x2A 0x80 0x4A 0x40 0x51 0x40 0x91 0x20
+  0x4A 0x40 0x00 0x00 0x00 0x00 0x00 0x00
+: dancing-octopus-right #11x13 (SUPERCHIP)
+  0x1F 0x00 0x3F 0x80 0x3F 0xA0 0x3F 0xA0
+  0xBF 0xA0 0x9A 0xA0 0x9D 0x20 0x4A 0x40
+  0x2A 0x80 0x4A 0x40 0x51 0x40 0x91 0x20
+  0x4A 0x40 0x00 0x00 0x00 0x00 0x00 0x00
+: dancing-octopus-left  #11x13 (SUPERCHIP)
+  0x1F 0x00 0x3F 0x80 0xBF 0x80 0xBF 0x80
+  0xBF 0xA0 0xAB 0xA0 0x97 0x20 0x4A 0x40
   0x2A 0x80 0x4A 0x40 0x51 0x40 0x91 0x20
   0x4A 0x40 0x00 0x00 0x00 0x00 0x00 0x00
 
@@ -173,6 +183,7 @@
   : game-mode       1
   : current-level   1
   : food-remaining  4
+  : octopus-coords  0 0
 
   : board-food
   # type ---  taken --- x pos --- y pos
@@ -267,6 +278,16 @@
   again
 ;
 
+: set-state
+  i := food-remaining
+  save v0
+
+  v0 := v1
+  v1 := v2
+  i := octopus-coords
+  save v1
+;
+
 
 #-- drawing --------------------------------#
 
@@ -335,11 +356,15 @@
 ;
 
 : draw-octopus
-  # arguments:
-  #   v1 -> octopus x pos
-  #   v2 -> octopus y pos
+  i := octopus-coords
+  load v1
 
-  # draw the octopus head
+  # v1 -> octopus x pos
+  # v2 -> octopus y pos
+  v2 := v1
+  v1 := v0
+
+  # draw the octopus
   i := octopus
   sprite v1 v2 0
 
@@ -378,15 +403,18 @@
 ;
 
 : draw-board
-  i  := board-food
-  load v3
   # v0 -> food-type
   # v1 -> food-taken
   # v2 -> food-x
   # v3 -> food-y
 
-  v4 := 0
+  v4 := -4
   loop
+    v4 += 4
+    i  := board-food
+    i  += v4
+    load v3
+
     while v0 != 0xFF
       if v1 == 0 begin
         v0 <<= v0
@@ -394,11 +422,6 @@
         select-food
         sprite v2 v3 7
       end
-
-      v4 += 4
-      i  := board-food
-      i  += v4
-      load v3
   again
 
   countdown
@@ -411,824 +434,844 @@
 
 #-- levels ---------------------------------#
 
-: level-1
-  # food-counter
-  3
-
-  # starting-position
-  58 24
-
-: level-1-food
-  # type - taken - x pos - y pos
-    5      0       10      10
-    7      0       112     10
-    2      0       60      48
-    0xFF   0       0       0
-
-: create-level-1
-  i := level-1
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-1-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  draw-board
-;
-
-: level-2
-  # food-counter
-  7
-
-  # starting-position
-  14 6
-
-: level-2-food
-  # type - taken - x pos - y pos
-    4      0       42      8
-    4      0       42      22
-    4      0       42      52
-    4      0       58      52
-    4      0       74      52
-    4      0       106     16
-    4      0       106     40
-    0xFF   0       0       0
-
-: create-level-2
-  i := level-2
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-2-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  draw-board
-;
-
-: level-3
-  # food-counter
-  6
-
-  # starting-position
-  58 24
-
-: level-3-food
-  # type - taken - x pos - y pos
-    2      0       20      8
-    4      0       2       34
-    3      0       68      23
-    1      0       58      50
-    1      0       96      11
-    6      0       108     54
-    0xFF   0       0       0
-
-: create-level-3
-  i := level-3
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-3-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  draw-board
-;
-
-: level-4
-  # food-counter
-  6
-
-  # starting-position
-  58 4
-
-: level-4-food
-  # type - taken - x pos - y pos
-    1      0       28      32
-    1      0       60      32
-    1      0       92      32
-    2      0       44      42
-    2      0       76      42
-    1      0       60      52
-    0xFF   0       0       0
-
-: create-level-4
-  i := level-4
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-4-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  v1 := 0
-  v2 := 20
-  i  := horizontal-line-8
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 16
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  draw-board
-;
-
-: level-5
-  # food-counter
-  7
-
-  # starting-position
-  58 46
-
-: level-5-food
-  # type - taken - x pos - y pos
-    5      0       10      10
-    4      0       28      30
-    1      0       28      48
-    2      0       82      16
-    3      0       100     28
-    3      0       120     28
-    6      0       113     47
-    0xFF   0       0       0
-
-: create-level-5
-  i := level-5
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-5-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  v1 := 18
-  v2 := 42
-  i  := horizontal-line-8
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 11
-      sprite v1 v2 1
-      v1 += 8
-  again
-  v1 := 106
-  i  := horizontal-line-4
-  sprite v1 v2 1
-
-  v1 := 0
-  v2 := 22
-  i  := horizontal-line-8
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 4
-      sprite v1 v2 1
-      v1 += 8
-  again
-  v1 := 32
-  i  := horizontal-line-4
-  sprite v1 v2 1
-
-  i  := vertical-line
-  v1 := 35
-  v2 := 61
-  sprite v1 v2 15
-  v2 := 12
-  sprite v1 v2 10
-
-  v1 := 18
-  v2 := 43
-  sprite v1 v2 15
-  v2 := 58
-  sprite v1 v2 9
-
-  v1 := 109
-  v2 := 43
-  sprite v1 v2 15
-  v2 := 58
-  sprite v1 v2 9
-
-  v1 := 64
-  v2 := 3
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 3
-      sprite v1 v2 13
-      v2 += 13
-  again
-
-  draw-board
-;
-
-: level-6
-  # food-counter
-  6
-
-  # starting-position
-  16 39
-
-: level-6-food
-  # type - taken - x pos - y pos
-    2      0       10      10
-    4      0       34      30
-    4      0       52      10
-    1      0       70      30
-    5      0       88      26
-    5      0       93      26
-    0xFF   0       0       0
-
-: create-level-6
-  i := level-6
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-6-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  v1 := 126
-  v2 := 37
-  i  := horizontal-line-8
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 11
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 126
-  v2 := 53
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 13
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 86
-  v2 := 21
-  sprite v1 v2 1
-  v1 := 94
-  sprite v1 v2 1
-
-  v1 := 85
-  i  := vertical-line
-  sprite v1 v2 15
-  v2 := 36
-  sprite v1 v2 1
-
-  v1 := 102
-  i  := vertical-line
-  sprite v1 v2 15
-  v2 := 21
-  sprite v1 v2 15
-  v2 := 51
-  sprite v1 v2 3
-
-  v1 := 126
-  v2 := 53
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 3
-      sprite v1 v2 15
-      v2 += 15
-  again
-  sprite v1 v2 4
-
-  draw-board
-;
-
-: level-7
-  # food-counter
-  8
-
-  # starting-position
-  93 8
-
-: level-7-food
-  # type - taken - x pos - y pos
-    7      0       25      53
-    7      0       35      53
-    7      0       45      53
-    7      0       55      53
-    3      0       15      58
-    3      0       11      60
-    3      0       70      58
-    3      0       74      60
-    0xFF   0       0       0
-
-: create-level-7
-  i := level-7
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-7-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  v1 := 20
-  i  := horizontal-line-8
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 6
-      v2 := 13
-      sprite v1 v2 1
-      v2 := 62
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 27
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 5
-      v2 := 20
-      sprite v1 v2 1
-      v2 := 40
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 21
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 5
-      v2 := 30
-      sprite v1 v2 1
-      v2 := 50
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v2 := 17
-  i  := vertical-line
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 3
-      v1 := 20
-      sprite v1 v2 15
-      v1 := 67
-      sprite v1 v2 15
-      v2 += 15
-  again
-
-  draw-board
-;
-
-: level-8
-  # food-counter
-  6
-
-  # starting-position
-  59 30
-
-: level-8-food
-  # type - taken - x pos - y pos
-    1      0       24      7
-    2      0       98      7
-    1      0       116     24
-    2      0       6       46
-    7      0       61      53
-    6      0       114     7
-    0xFF   0       0       0
-
-: create-level-8
-  i := level-8
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-8-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  i  := horizontal-line-8
-  v1 := 110
-  v4 := -1
-  loop
-    v4 += 1
-    if v4 == 2 then i := horizontal-line-4
-    while v4 < 3
-      v2 := 17
-      sprite v1 v2 1
-      v2 := 33
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  i  := horizontal-line-8
-  v1 := 126
-  v4 := -1
-  loop
-    v4 += 1
-    if v4 == 2 then i := horizontal-line-4
-    while v4 < 3
-      v2 := 40
-      sprite v1 v2 1
-      v2 := 56
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  i  := horizontal-line-8
-  v1 := 20
-  v2 := 17
-  sprite v1 v2 1
-  v1 := 28
-  sprite v1 v2 1
-
-  v1 := 93
-  v2 := 17
-  sprite v1 v2 1
-  v1 := 101
-  sprite v1 v2 1
-
-  v1 := 56
-  v2 := 48
-  sprite v1 v2 1
-  v1 := 64
-  sprite v1 v2 1
-
-  i  := vertical-line
-  v1 := 19
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 36
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 92
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 5
-
-  v1 := 109
-  v2 := 62
-  sprite v1 v2 15
-  v2 := 13
-  sprite v1 v2 15
-  v2 := 28
-  sprite v1 v2 6
-
-  v1 := 18
-  v2 := 40
-  sprite v1 v2 15
-  v2 := 55
-  sprite v1 v2 2
-
-  v1 := 55
-  v2 := 48
-  sprite v1 v2 15
-  v2 := 63
-  sprite v1 v2 4
-
-  v1 := 72
-  v2 := 48
-  sprite v1 v2 15
-  v2 := 63
-  sprite v1 v2 4
-
-  draw-board
-;
-
-: level-9
-  # food-counter
-  6
-
-  # starting-position
-  58 33
-
-: level-9-food
-  # type - taken - x pos - y pos
-    5      0       22      14
-    6      0       54      51
-    5      0       70      6
-    6      0       70      20
-    5      0       107     4
-    6      0       1       25
-    0xFF   0       0       0
-
-: create-level-9
-  i := level-9
-  load v2
-  # v0 -> number of foods
-  # v1 -> starting x pos
-  # v2 -> starting y pos
-
-  i := food-remaining
-  save v0
-
-  draw-octopus
-
-  # load the food into the board
-  v4 := -4
-  loop
-    v4 += 4
-    i  := level-9-food
-    i  += v4
-    load v3
-
-    while v0 != 0xFF
-      i := board-food
-      i += v4
-      save v3
-  again
-
-  #draw the walls
-  i  := horizontal-line-8
-  v1 := 36
-  v2 := 31
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 6
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 20
-  v2 := 46
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 11
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 19
-  v2 := 10
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 4
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 36
-  v2 := 20
-  sprite v1 v2 1
-  v1 := 44
-  sprite v1 v2 1
-  i  := dot
-  v1 := 51
-  sprite v1 v2 1
-
-  i  := horizontal-line-8
-  v1 := 0
-  v2 := 18
-  sprite v1 v2 1
-  v2 := 36
-  sprite v1 v2 1
-  v1 := 8
-  sprite v1 v2 1
-  v1 := 16
-  i  := horizontal-line-2
-  sprite v1 v2 1
-
-  i  := horizontal-line-8
-  v1 := 65
-  v2 := 16
-  sprite v1 v2 1
-  v1 := 73
-  sprite v1 v2 1
-  v1 := 81
-  i  := horizontal-line-2
-  sprite v1 v2 1
-
-  i  := horizontal-line-8
-  v1 := 102
-  v2 := 0
-  sprite v1 v2 1
-  v1 := 110
-  sprite v1 v2 1
-  v1 := 118
-  i  := horizontal-line-2
-  sprite v1 v2 1
-
-  i  := horizontal-line-8
-  v1 := 20
-  v2 := 55
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 3
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  v1 := 68
-  v2 := 55
-  v4 := -1
-  loop
-    v4 += 1
-    while v4 < 5
-      sprite v1 v2 1
-      v1 += 8
-  again
-
-  i  := vertical-line
-  v1 := 18
-  v2 := 10
-  sprite v1 v2 15
-  v2 := 25
-  sprite v1 v2 12
-
-  v1 := 36
-  v2 := 21
-  sprite v1 v2 10
-
-  v1 := 64
-  v2 := 0
-  sprite v1 v2 15
-  v2 := 15
-  sprite v1 v2 10
-
-  v1 := 83
-  v2 := 16
-  sprite v1 v2 15
-
-  v1 := 101
-  v2 := 0
-  sprite v1 v2 15
-  v2 := 15
-  sprite v1 v2 15
-  v2 := 30
-  sprite v1 v2 2
-
-  v1 := 120
-  v2 := 0
-  sprite v1 v2 15
-  v2 := 15
-  sprite v1 v2 15
-  v2 := 30
-  sprite v1 v2 2
-
-  v1 := 43
-  v2 := 47
-  sprite v1 v2 8
-  v2 := 56
-  v1 := 68
-  sprite v1 v2 8
-
-  draw-board
-;
+  # level 1 --------------------------------#
+
+  : level-1
+    # food-counter
+    3
+
+    # starting-position
+    58 24
+
+  : level-1-food
+    # type - taken - x pos - y pos
+      5      0       10      10
+      7      0       112     10
+      2      0       60      48
+      0xFF   0       0       0
+
+  : create-level-1
+    i := level-1
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-1-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    draw-board
+  ;
+
+
+  # level 2 --------------------------------#
+
+  : level-2
+    # food-counter
+    7
+
+    # starting-position
+    14 6
+
+  : level-2-food
+    # type - taken - x pos - y pos
+      4      0       42      8
+      4      0       42      22
+      4      0       42      52
+      4      0       58      52
+      4      0       74      52
+      4      0       106     16
+      4      0       106     40
+      0xFF   0       0       0
+
+  : create-level-2
+    i := level-2
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-2-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    draw-board
+  ;
+
+
+  # level 3 --------------------------------#
+
+  : level-3
+    # food-counter
+    6
+
+    # starting-position
+    58 24
+
+  : level-3-food
+    # type - taken - x pos - y pos
+      2      0       20      8
+      4      0       2       34
+      3      0       68      23
+      1      0       58      50
+      1      0       96      11
+      6      0       108     54
+      0xFF   0       0       0
+
+  : create-level-3
+    i := level-3
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-3-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    draw-board
+  ;
+
+
+  # level 4 --------------------------------#
+
+  : level-4
+    # food-counter
+    6
+
+    # starting-position
+    58 4
+
+  : level-4-food
+    # type - taken - x pos - y pos
+      1      0       28      32
+      1      0       60      32
+      1      0       92      32
+      2      0       44      42
+      2      0       76      42
+      1      0       60      52
+      0xFF   0       0       0
+
+  : level-4-walls
+    v1 := 0
+    v2 := 20
+    i  := horizontal-line-8
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 16
+        sprite v1 v2 1
+        v1 += 8
+    again
+  ;
+
+  : create-level-4
+    i := level-4
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-4-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-4-walls
+    draw-board
+  ;
+
+
+  # level 5 --------------------------------#
+
+  : level-5
+    # food-counter
+    7
+
+    # starting-position
+    58 46
+
+  : level-5-food
+    # type - taken - x pos - y pos
+      5      0       10      10
+      4      0       28      30
+      1      0       28      48
+      2      0       82      16
+      3      0       100     28
+      3      0       120     28
+      6      0       113     47
+      0xFF   0       0       0
+
+  : level-5-walls
+    v1 := 18
+    v2 := 42
+    i  := horizontal-line-8
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 11
+        sprite v1 v2 1
+        v1 += 8
+    again
+    v1 := 106
+    i  := horizontal-line-4
+    sprite v1 v2 1
+
+    v1 := 0
+    v2 := 22
+    i  := horizontal-line-8
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 4
+        sprite v1 v2 1
+        v1 += 8
+    again
+    v1 := 32
+    i  := horizontal-line-4
+    sprite v1 v2 1
+
+    i  := vertical-line
+    v1 := 35
+    v2 := 61
+    sprite v1 v2 15
+    v2 := 12
+    sprite v1 v2 10
+
+    v1 := 18
+    v2 := 43
+    sprite v1 v2 15
+    v2 := 58
+    sprite v1 v2 9
+
+    v1 := 109
+    v2 := 43
+    sprite v1 v2 15
+    v2 := 58
+    sprite v1 v2 9
+
+    v1 := 64
+    v2 := 3
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 3
+        sprite v1 v2 13
+        v2 += 13
+    again
+  ;
+
+  : create-level-5
+    i := level-5
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-5-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-5-walls
+    draw-board
+  ;
+
+
+  # level 6 --------------------------------#
+
+  : level-6
+    # food-counter
+    6
+
+    # starting-position
+    16 39
+
+  : level-6-food
+    # type - taken - x pos - y pos
+      2      0       10      10
+      4      0       34      30
+      4      0       52      10
+      1      0       70      30
+      5      0       88      26
+      5      0       93      26
+      0xFF   0       0       0
+
+  : level-6-walls
+    v1 := 126
+    v2 := 37
+    i  := horizontal-line-8
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 11
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 126
+    v2 := 53
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 13
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 86
+    v2 := 21
+    sprite v1 v2 1
+    v1 := 94
+    sprite v1 v2 1
+
+    v1 := 85
+    i  := vertical-line
+    sprite v1 v2 15
+    v2 := 36
+    sprite v1 v2 1
+
+    v1 := 102
+    i  := vertical-line
+    sprite v1 v2 15
+    v2 := 21
+    sprite v1 v2 15
+    v2 := 51
+    sprite v1 v2 3
+
+    v1 := 126
+    v2 := 53
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 3
+        sprite v1 v2 15
+        v2 += 15
+    again
+    sprite v1 v2 4
+  ;
+
+  : create-level-6
+    i := level-6
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-6-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-6-walls
+    draw-board
+  ;
+
+
+  # level 7 --------------------------------#
+
+  : level-7
+    # food-counter
+    8
+
+    # starting-position
+    93 8
+
+  : level-7-food
+    # type - taken - x pos - y pos
+      7      0       25      53
+      7      0       35      53
+      7      0       45      53
+      7      0       55      53
+      3      0       15      58
+      3      0       11      60
+      3      0       70      58
+      3      0       74      60
+      0xFF   0       0       0
+
+  : level-7-walls
+    v1 := 20
+    i  := horizontal-line-8
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 6
+        v2 := 13
+        sprite v1 v2 1
+        v2 := 62
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 27
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 5
+        v2 := 20
+        sprite v1 v2 1
+        v2 := 40
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 21
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 5
+        v2 := 30
+        sprite v1 v2 1
+        v2 := 50
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v2 := 17
+    i  := vertical-line
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 3
+        v1 := 20
+        sprite v1 v2 15
+        v1 := 67
+        sprite v1 v2 15
+        v2 += 15
+    again
+  ;
+
+  : create-level-7
+    i := level-7
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-7-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-7-walls
+    draw-board
+  ;
+
+
+  # level 8 --------------------------------#
+
+  : level-8
+    # food-counter
+    6
+
+    # starting-position
+    59 30
+
+  : level-8-food
+    # type - taken - x pos - y pos
+      1      0       24      7
+      2      0       98      7
+      1      0       116     24
+      2      0       6       46
+      7      0       61      53
+      6      0       114     7
+      0xFF   0       0       0
+
+  : level-8-walls
+    i  := horizontal-line-8
+    v1 := 110
+    v4 := -1
+    loop
+      v4 += 1
+      if v4 == 2 then i := horizontal-line-4
+      while v4 < 3
+        v2 := 17
+        sprite v1 v2 1
+        v2 := 33
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    i  := horizontal-line-8
+    v1 := 126
+    v4 := -1
+    loop
+      v4 += 1
+      if v4 == 2 then i := horizontal-line-4
+      while v4 < 3
+        v2 := 40
+        sprite v1 v2 1
+        v2 := 56
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    i  := horizontal-line-8
+    v1 := 20
+    v2 := 17
+    sprite v1 v2 1
+    v1 := 28
+    sprite v1 v2 1
+
+    v1 := 93
+    v2 := 17
+    sprite v1 v2 1
+    v1 := 101
+    sprite v1 v2 1
+
+    v1 := 56
+    v2 := 48
+    sprite v1 v2 1
+    v1 := 64
+    sprite v1 v2 1
+
+    i  := vertical-line
+    v1 := 19
+    v2 := 62
+    sprite v1 v2 15
+    v2 := 13
+    sprite v1 v2 5
+
+    v1 := 36
+    v2 := 62
+    sprite v1 v2 15
+    v2 := 13
+    sprite v1 v2 5
+
+    v1 := 92
+    v2 := 62
+    sprite v1 v2 15
+    v2 := 13
+    sprite v1 v2 5
+
+    v1 := 109
+    v2 := 62
+    sprite v1 v2 15
+    v2 := 13
+    sprite v1 v2 15
+    v2 := 28
+    sprite v1 v2 6
+
+    v1 := 18
+    v2 := 40
+    sprite v1 v2 15
+    v2 := 55
+    sprite v1 v2 2
+
+    v1 := 55
+    v2 := 48
+    sprite v1 v2 15
+    v2 := 63
+    sprite v1 v2 4
+
+    v1 := 72
+    v2 := 48
+    sprite v1 v2 15
+    v2 := 63
+    sprite v1 v2 4
+  ;
+
+  : create-level-8
+    i := level-8
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-8-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-8-walls
+    draw-board
+  ;
+
+
+  # level 9 --------------------------------#
+
+  : level-9
+    # food-counter
+    6
+
+    # starting-position
+    58 33
+
+  : level-9-food
+    # type - taken - x pos - y pos
+      5      0       22      14
+      6      0       54      51
+      5      0       70      6
+      6      0       70      20
+      5      0       107     4
+      6      0       1       25
+      0xFF   0       0       0
+
+  : level-9-walls
+    i  := horizontal-line-8
+    v1 := 36
+    v2 := 31
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 6
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 20
+    v2 := 46
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 11
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 19
+    v2 := 10
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 4
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 36
+    v2 := 20
+    sprite v1 v2 1
+    v1 := 44
+    sprite v1 v2 1
+    i  := dot
+    v1 := 51
+    sprite v1 v2 1
+
+    i  := horizontal-line-8
+    v1 := 0
+    v2 := 18
+    sprite v1 v2 1
+    v2 := 36
+    sprite v1 v2 1
+    v1 := 8
+    sprite v1 v2 1
+    v1 := 16
+    i  := horizontal-line-2
+    sprite v1 v2 1
+
+    i  := horizontal-line-8
+    v1 := 65
+    v2 := 16
+    sprite v1 v2 1
+    v1 := 73
+    sprite v1 v2 1
+    v1 := 81
+    i  := horizontal-line-2
+    sprite v1 v2 1
+
+    i  := horizontal-line-8
+    v1 := 102
+    v2 := 0
+    sprite v1 v2 1
+    v1 := 110
+    sprite v1 v2 1
+    v1 := 118
+    i  := horizontal-line-2
+    sprite v1 v2 1
+
+    i  := horizontal-line-8
+    v1 := 20
+    v2 := 55
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 3
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    v1 := 68
+    v2 := 55
+    v4 := -1
+    loop
+      v4 += 1
+      while v4 < 5
+        sprite v1 v2 1
+        v1 += 8
+    again
+
+    i  := vertical-line
+    v1 := 18
+    v2 := 10
+    sprite v1 v2 15
+    v2 := 25
+    sprite v1 v2 12
+
+    v1 := 36
+    v2 := 21
+    sprite v1 v2 10
+
+    v1 := 64
+    v2 := 0
+    sprite v1 v2 15
+    v2 := 15
+    sprite v1 v2 10
+
+    v1 := 83
+    v2 := 16
+    sprite v1 v2 15
+
+    v1 := 101
+    v2 := 0
+    sprite v1 v2 15
+    v2 := 15
+    sprite v1 v2 15
+    v2 := 30
+    sprite v1 v2 2
+
+    v1 := 120
+    v2 := 0
+    sprite v1 v2 15
+    v2 := 15
+    sprite v1 v2 15
+    v2 := 30
+    sprite v1 v2 2
+
+    v1 := 43
+    v2 := 47
+    sprite v1 v2 8
+    v2 := 56
+    v1 := 68
+    sprite v1 v2 8
+  ;
+
+  : create-level-9
+    i := level-9
+    load v2
+    # v0 -> number of foods
+    # v1 -> starting x pos
+    # v2 -> starting y pos
+
+    set-state
+    draw-octopus
+
+    # load the food into the board
+    v4 := -4
+    loop
+      v4 += 4
+      i  := level-9-food
+      i  += v4
+      load v3
+
+      while v0 != 0xFF
+        i := board-food
+        i += v4
+        save v3
+    again
+
+    level-9-walls
+    draw-board
+  ;
 
 
 #-- movement -------------------------------#
@@ -1421,7 +1464,7 @@
   load v0
   if v0 > 0 then return
 
-  countdown
+  dance
 
 : skip-level
   sweep-board
@@ -1462,6 +1505,19 @@
   if v0 == 9 then create-level-9
 ;
 
+: redraw-level
+  i  := current-level
+  load v0
+
+  clear
+  if v0 == 4 then level-4-walls
+  if v0 == 5 then level-5-walls
+  if v0 == 6 then level-6-walls
+  if v0 == 7 then level-7-walls
+  if v0 == 8 then level-8-walls
+  if v0 == 9 then level-9-walls
+;
+
 : countdown
   v1 := 0
   loop
@@ -1470,6 +1526,51 @@
       draw-arm1
       draw-arm2
       v0    := 30
+      delay := v0
+      loop
+        v0 := delay
+        if v0 != 0 then
+      again
+  again
+;
+
+: dance
+  v0    := 40
+  delay := v0
+  loop
+    v0 := delay
+    if v0 != 0 then
+  again
+
+  clear
+  redraw-level
+
+  i := octopus-coords
+  load v1
+
+  # v1 -> octopus x pos
+  # v2 -> octopus y pos
+  v2 := v1
+  v1 := v0
+
+  i := dancing-octopus-left
+  sprite v1 v2 0
+# v9 -> track octopus dance state
+  v9 := 0
+# v8 -> will XOR will v9 to alternate state
+  v8 := 1
+
+  v4 := 0
+  loop
+    v4 += 1
+    while v4 < 9
+      sprite v1 v2 0
+      if v9 == 1 then i := dancing-octopus-left
+      if v9 == 0 then i := dancing-octopus-right
+      sprite v1 v2 0
+      v9 ^= v8
+
+      v0    := 15
       delay := v0
       loop
         v0 := delay
