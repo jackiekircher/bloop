@@ -9,7 +9,7 @@ frenzies for food.
 you must collect every piece of food to advance to the next level. can
 you beat all 9?
 
-for an extra challenge, try raising the clock speed above the defaul 60
+for an extra challenge, try raising the clock speed above the default 60
 cycles/frame ;)
 
 ## controls
